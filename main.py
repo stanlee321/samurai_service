@@ -9,10 +9,11 @@ import json
 import sys
 import warnings
 sys.path.append("./samurai/sam2/sam2")
-from samurai.sam2.sam2.build_sam import build_sam2_video_predictor
 from typing import List
+from libs.queues import KafkaHandler
+from samurai.sam2.sam2.build_sam import build_sam2_video_predictor
 
-SERVER_IP = "192.168.1.19"
+SERVER_IP = "192.168.1.15"
 API_BASE_URL = f"http://{SERVER_IP}:8003"
 
 minio_key = "c3aFDmKuGhPCSxkpRDGf"
@@ -20,7 +21,7 @@ minio_secret = "MLYz9tZI3h4xZAwBl8llyEtX6R07YcMuRdSYPIcx"
 minio_url = f"{SERVER_IP}:9000"
 
 BUCKET_NAME = "my-bucket"
-TOPIC_INPUT = "video-general-results"
+TOPIC_INPUT = "video-general-sam"
 TOPIC_OUTPUT = "video-fine-detections"
 
 brokers = [f'{SERVER_IP}:9092']
@@ -180,8 +181,8 @@ class VideoProcessor:
         return str(uuid.uuid4())
     
     def run(self, offset: str = "latest"):
-        group_id = 'video-aggregator-' + self.generate_uuid()
-        consumer = self.kafka_handler.create_consumer(self.topic_input,
+        group_id = 'video-samurai-' + self.generate_uuid()
+        consumer = self.kafka_handler.create_consumer(TOPIC_INPUT,
                                                       group_id=group_id,
                                                       auto_offset_reset=offset)
 
